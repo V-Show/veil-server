@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-core-4.1.0.jar" sourcepath="c:/repos/Smack/smack-core/"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-tcp-4.1.0.jar" sourcepath="c:/repos/Smack/smack-tcp/"/>
+	<classpathentry exported="true" kind="lib" path="libs/kxml2-2.3.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jxmpp-core-0.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/jxmpp-util-cache-0.4.1.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-im-4.1.0.jar" sourcepath="c:/repos/Smack/smack-im/src/main/java/"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-sasl-provided-4.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-bosh-4.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-extensions-4.1.0.jar" sourcepath="c:/repos/Smack/smack-extensions/src/main/java/"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-resolver-dnsjava-4.1.0.jar"/>
+	<classpathentry exported="true" kind="lib" path="libs/smack-java7-4.1.0.jar"/>
+	<classpathentry kind="lib" path="libs/dom4j-1.6.1.jar" sourcepath="c:/openfire/dom4j-1.6.1/src/java/"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
