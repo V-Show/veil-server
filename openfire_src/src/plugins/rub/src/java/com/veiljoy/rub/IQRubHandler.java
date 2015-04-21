@@ -18,13 +18,14 @@ public class IQRubHandler extends IQHandler {
 
 	@Override
 	public IQ handleIQ(IQ packet) throws UnauthorizedException {
-		System.out.print("handleIQ: " + packet.toString());
+		System.out.println("handle IQ: " + packet.toString());
 		JID user = packet.getFrom();
 		RubInfo reply = new RubInfo("query", "com.veil.rub", user);
 		reply.setFrom(XMPPServer.getInstance().getServerInfo().getXMPPDomain());
 		reply.setTo(user);
 		reply.setType(IQ.Type.result);
-		System.out.print("reply: " + reply.toString());
+		reply.setID(packet.getID());
+		System.out.println("reply: " + reply.toString());
 		return reply;
 	}
 

@@ -3,7 +3,7 @@
 	<classpathentry kind="src" path="src/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/Openfire XMPP Server"/>
-	<classpathentry kind="lib" path="lib/tinder-1.2.2.jar"/>
-	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar"/>
+	<classpathentry kind="lib" path="lib/tinder-1.2.2.jar" sourcepath="c:/openfire/tinder-1.2.2/src/main/java/"/>
+	<classpathentry kind="lib" path="lib/dom4j-1.6.1.jar" sourcepath="c:/openfire/dom4j-1.6.1/src/java/"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
