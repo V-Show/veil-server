@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Plugin configuration for the broadcast plugin.
+-->
+<plugin>
+    <class>org.jivesoftware.openfire.plugin.RubPlugin</class>
+    <name>rub</name>
+    <description>Pari Matching plugin.</description>
+    <author>veil group</author>
+    <version>0.0.1</version>
+    <date>4/16/2015</date>
+    <url>http://veiljoy.com</url>
+    <minServerVersion>3.9.0</minServerVersion>
+</plugin>
