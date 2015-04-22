@@ -39,7 +39,7 @@ public class MySpark {
 		}
 
 		// send a room iq
-		final IQ iq = new RubReq("query", "com.veil.rub");
+		final IQ iq = new RubReq();
 		iq.setType(IQ.Type.get);
 		connection.sendStanza(iq);
 
@@ -197,7 +197,8 @@ public class MySpark {
 		RubTest rub = new RubTest(connection);
 		RubInfo info = rub.getRubInfo();
 		if (info != null) {
-			System.out.println("rub info: " + info.toString());
+			System.out.println("rub room: " + info.getRoom() + ", create: "
+					+ info.isCreate());
 		}
 
 		// main loop

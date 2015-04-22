@@ -4,8 +4,13 @@ import org.jivesoftware.smack.packet.IQ;
 
 public class RubReq extends IQ {
 
-	public RubReq(String childElementName, String childElementNamespace) {
-		super(childElementName, childElementNamespace);
+    public static final String ELEMENT = QUERY_ELEMENT;
+    public static final String NAMESPACE = "com.veil.rub";
+
+	public RubReq() {
+		super(ELEMENT, NAMESPACE);
+		
+		this.setType(IQ.Type.get);
 	}
 
 	@Override

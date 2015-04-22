@@ -3,12 +3,18 @@ package com.veiljoy.rub;
 import org.jivesoftware.smack.packet.IQ;
 
 public class RubInfo extends IQ {
-	
+
+    public static final String ELEMENT = QUERY_ELEMENT;
+    public static final String NAMESPACE = "com.veil.rub";
+
 	String room;
 	boolean create;
 
-	protected RubInfo(String childElementName, String childElementNamespace) {
-		super(childElementName, childElementNamespace);
+	protected RubInfo() {
+		super(ELEMENT, NAMESPACE);
+		
+		room = "hall";
+		create = false;
 	}
 
 	@Override

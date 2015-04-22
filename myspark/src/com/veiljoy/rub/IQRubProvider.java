@@ -12,45 +12,35 @@ public class IQRubProvider extends IQProvider<RubInfo> {
 	@Override
 	public RubInfo parse(XmlPullParser parser, int initialDepth)
 			throws XmlPullParserException, IOException, SmackException {
-		String name = parser.getName();
-		String namespace = parser.getNamespace();
-		RubInfo info = new RubInfo(name, namespace);
-		
-		String room = "hall";
-		boolean create = false;
-		try {
-			int eventType = parser.getEventType();
-			String tag = null;
-			boolean done = false;
-			while (!done) {
-				switch (eventType) {
-				case XmlPullParser.START_TAG: {
-					tag = parser.getName();
-				}
-					break;
-				case XmlPullParser.END_TAG: {
-					String tagName = parser.getName();
-					if (tagName.equals(name)) {
-						done = true;
-					}
-				}
-					break;
-				case XmlPullParser.TEXT:
-					if (tag != null)
-						if (tag.equals("room")) {
-							room = parser.getText();
-						} else if (tag.equals("create")) {
-							create = Boolean.parseBoolean(parser.getText());
-						}
-					break;
-				default:
-					break;
-				}
+		RubInfo info = new RubInfo();
 
-				eventType = parser.next();
+		String room = info.getRoom();
+		boolean create = info.isCreate();
+
+		boolean done = false;
+		while (!done) {
+			int eventType = parser.next();
+			switch (eventType) {
+			case XmlPullParser.START_TAG:
+				String startTag = parser.getName();
+				switch (startTag) {
+				case "room":
+					room = parser.nextText();
+					break;
+				case "create":
+					create = Boolean.parseBoolean(parser.nextText());
+					break;
+				}
+				break;
+			case XmlPullParser.END_TAG:
+				String endTag = parser.getName();
+				switch (endTag) {
+				case "query":
+					done = true;
+					break;
+				}
+				break;
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 
 		info.setCreate(create);
