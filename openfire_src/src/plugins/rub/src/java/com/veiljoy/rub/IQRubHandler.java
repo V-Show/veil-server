@@ -21,7 +21,7 @@ public class IQRubHandler extends IQHandler {
 		System.out.println("handle IQ: " + packet.toString());
 		JID user = packet.getFrom();
 		RubInfo reply = new RubInfo("query", "com.veil.rub", user);
-		reply.setFrom(XMPPServer.getInstance().getServerInfo().getXMPPDomain());
+		reply.setFrom(packet.getTo());
 		reply.setTo(user);
 		reply.setType(IQ.Type.result);
 		reply.setID(packet.getID());
