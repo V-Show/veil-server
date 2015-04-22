@@ -151,7 +151,7 @@ public class MySpark {
 	public static void main(String[] argus) {
 		// test dom4j
 		Dom4jTest dom4jTest = new Dom4jTest();
-		if (dom4jTest.test()){
+		if (dom4jTest.test()) {
 			return;
 		}
 
@@ -163,21 +163,28 @@ public class MySpark {
 		AbstractXMPPConnection connection = conn.getConnection();
 
 		// login
+		final String username = "lucy";
+		final String password = "lcboat";
 		AccountTest account = new AccountTest(connection);
-		connection = account.login("adam", "lcboat");
+		connection = account.login(username, password);
 		if (connection == null) {
 			return;
 		}
 
 		// vcard
+		final String usergender = "female";
 		VCardTest vcard = new VCardTest(connection);
 		String gender = vcard.getField("GENDER");
 		System.out.println("1: GENDER: " + gender);
-		if (!"female".equals(gender)) {
-			vcard.setField("GENDER", "male");
+		if (!usergender.equals(gender)) {
+			vcard.setField("GENDER", usergender);
 			vcard.flush();
+
+			// renew a vcard to check gender
+			vcard = new VCardTest(connection);
+			gender = vcard.getField("GENDER");
+			System.out.println("2: GENDER: " + gender);
 		}
-		System.out.println("2: GENDER: " + gender);
 
 		// chat
 		if (sendMessageTest) {
@@ -189,7 +196,9 @@ public class MySpark {
 		// rub
 		RubTest rub = new RubTest(connection);
 		RubInfo info = rub.getRubInfo();
-		System.out.println("rub info: " + info.toString());
+		if (info != null) {
+			System.out.println("rub info: " + info.toString());
+		}
 
 		// main loop
 		while (true) {

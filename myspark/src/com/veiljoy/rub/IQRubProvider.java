@@ -15,8 +15,46 @@ public class IQRubProvider extends IQProvider<RubInfo> {
 		String name = parser.getName();
 		String namespace = parser.getNamespace();
 		RubInfo info = new RubInfo(name, namespace);
-		info.setCreate(true);
-		info.setRoom("my room");
+		
+		String room = "hall";
+		boolean create = false;
+		try {
+			int eventType = parser.getEventType();
+			String tag = null;
+			boolean done = false;
+			while (!done) {
+				switch (eventType) {
+				case XmlPullParser.START_TAG: {
+					tag = parser.getName();
+				}
+					break;
+				case XmlPullParser.END_TAG: {
+					String tagName = parser.getName();
+					if (tagName.equals(name)) {
+						done = true;
+					}
+				}
+					break;
+				case XmlPullParser.TEXT:
+					if (tag != null)
+						if (tag.equals("room")) {
+							room = parser.getText();
+						} else if (tag.equals("create")) {
+							create = Boolean.parseBoolean(parser.getText());
+						}
+					break;
+				default:
+					break;
+				}
+
+				eventType = parser.next();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		info.setCreate(create);
+		info.setRoom(room);
 		System.out.println("IQRubProvider rub info: " + info.toString());
 		return info;
 	}
