@@ -147,7 +147,7 @@
 
     <!-- For auto-running and debugging -->
     <property name="debug" value="false"/>
-    <property name="plugin" value="rub"/>
+    <property name="plugin" value="balcony"/>
 
     <!-- ======================================================================================= -->
     <!-- PATHs / PATTERNSETs / FILTERSETs                                                        -->

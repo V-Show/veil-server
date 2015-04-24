@@ -11,6 +11,8 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 
 public class ConnectionTest {
 	private AbstractXMPPConnection connection;
+	static final String SERIVCE_NAME = "veil";
+	static final String HOST = "veiljoy.com";
 
 	ConnectionTest() {
 	}
@@ -20,9 +22,9 @@ public class ConnectionTest {
 		XMPPTCPConnectionConfiguration config = XMPPTCPConnectionConfiguration
 				.builder()
 				// .setUsernameAndPassword("suyu", "lcboat")
-				.setServiceName("veil").setSecurityMode(SecurityMode.disabled)
+				.setServiceName(SERIVCE_NAME).setSecurityMode(SecurityMode.disabled)
 				.setResource("myspark").setDebuggerEnabled(true)
-				.setHost("localhost").build();
+				.setHost(HOST).build();
 		connection = new XMPPTCPConnection(config);
 		// connection.setFromMode(FromMode.USER);
 		try {
