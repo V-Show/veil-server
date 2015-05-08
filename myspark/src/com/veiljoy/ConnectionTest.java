@@ -12,7 +12,8 @@ import org.jivesoftware.smack.tcp.XMPPTCPConnectionConfiguration;
 public class ConnectionTest {
 	private AbstractXMPPConnection connection;
 	static final String SERIVCE_NAME = "veil";
-	static final String HOST = "veiljoy.com";
+	// static final String HOST = "veiljoy.com";
+	static final String HOST = "localhost";
 
 	ConnectionTest() {
 	}

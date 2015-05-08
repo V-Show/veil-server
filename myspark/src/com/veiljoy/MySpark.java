@@ -201,6 +201,10 @@ public class MySpark {
 					+ info.isCreate());
 		}
 
+		// muc test
+		MUCTest muc = new MUCTest(connection);
+		muc.init(info);
+
 		// main loop
 		while (true) {
 			try {
