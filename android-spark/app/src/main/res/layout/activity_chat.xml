@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/room_owner"
+        layout="@layout/include_room_owner" />
+
+    <include
+        android:id="@+id/roommate_1"
+        layout="@layout/include_roommate" />
+
+    <include
+        android:id="@+id/roommate_2"
+        layout="@layout/include_roommate" />
+
+    <include
+        android:id="@+id/roommate_3"
+        layout="@layout/include_roommate" />
+</LinearLayout>

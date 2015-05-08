@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- Strings related to login -->
+    <string name="prompt_nickname">Nickname</string>
+    <string name="prompt_password">Password (optional)</string>
+    <string name="gender">Gender</string>
+    <string name="male">Male</string>
+    <string name="female">Female</string>
+    <string name="action_sign_in">Register</string>
+    <string name="action_sign_in_short">Register</string>
+
+    <string name="error_invalid_email">This nickname is invalid</string>
+    <string name="error_invalid_password">This password is invalid</string>
+    <string name="error_incorrect_password">This password is incorrect</string>
+    <string name="error_field_required">This field is required</string>
+
+    <string name="error_connect">Connect failed</string>
+    <string name="dialog_title">Error</string>
+    <string name="dialog_message">Connect failed</string>
+    <string name="dialog_retry">Retry</string>
+    <string name="dialog_exit">Exit</string>
+
+</resources>
