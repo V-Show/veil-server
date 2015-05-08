@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.dom4j.Element;
 import org.jivesoftware.database.SequenceManager;
@@ -86,6 +89,21 @@ public class Balcony implements MUCRoom {
 	 */
 	private MUCRole role = new RoomRole(this);
 
+    /**
+     * The occupants of the room accessible by the occupants full JID.
+     */
+    private Map<JID, MUCRole> occupantsByFullJID = new ConcurrentHashMap<JID, MUCRole>();
+
+    /**
+     * The occupants of the room accessible by the occupants nickname.
+     */
+    private Map<String, List<MUCRole>> occupantsByNickname = new ConcurrentHashMap<String, List<MUCRole>>();
+
+    /**
+     * The occupants of the room accessible by the occupants bare JID.
+     */
+    private Map<JID, List<MUCRole>> occupantsByBareJID = new ConcurrentHashMap<JID, List<MUCRole>>();
+    
 	public Balcony(MultiUserChatService chatservice, String roomname,
 			PacketRouter packetRouter) {
 		this.mucService = chatservice;
@@ -192,35 +210,55 @@ public class Balcony implements MUCRoom {
 	}
 
 	@Override
+    /**
+     * @deprecated Prefer {@link #getOccupantsByNickname(String)} (user can be connected more than once)
+     */
 	public MUCRole getOccupant(String nickname) throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+        if (nickname == null) {
+            throw new UserNotFoundException();
+       }
+       List<MUCRole> roles = getOccupantsByNickname(nickname);
+       if (roles != null && roles.size() > 0) {
+       	return roles.get(0);
+       }
+       throw new UserNotFoundException();
 	}
 
 	@Override
 	public List<MUCRole> getOccupantsByNickname(String nickname)
 			throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+        if (nickname == null) {
+            throw new UserNotFoundException();
+       }
+       List<MUCRole> roles = occupantsByNickname.get(nickname.toLowerCase());
+       if (roles != null && roles.size() > 0) {
+       	return roles;
+       }
+       throw new UserNotFoundException();
 	}
 
 	@Override
 	public List<MUCRole> getOccupantsByBareJID(JID jid)
 			throws UserNotFoundException {
-		// TODO Auto-generated method stub
-		return null;
+        List<MUCRole> roles = occupantsByBareJID.get(jid);
+        if (roles != null && !roles.isEmpty()) {
+            return Collections.unmodifiableList(roles);
+        }
+        throw new UserNotFoundException();
 	}
 
 	@Override
 	public MUCRole getOccupantByFullJID(JID jid) {
-		// TODO Auto-generated method stub
-		return null;
+        MUCRole role = occupantsByFullJID.get(jid);
+        if (role != null) {
+            return role;
+        }
+        return null;
 	}
 
 	@Override
 	public Collection<MUCRole> getOccupants() {
-		// TODO Auto-generated method stub
-		return null;
+		return Collections.unmodifiableCollection(occupantsByFullJID.values());
 	}
 
 	@Override
