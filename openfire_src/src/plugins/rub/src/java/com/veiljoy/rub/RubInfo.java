@@ -88,7 +88,7 @@ public class RubInfo extends IQ {
 		for (MultiUserChatService service : services) {
 			List<MUCRoom> rooms = service.getChatRooms();
 			for (MUCRoom room : rooms) {
-				if (!room.isLocked() && room.getOccupants().size() < 3) {
+				if (!room.isLocked() && room.getOccupants().size() < 4 && !room.getName().equals("hall")) {
 					name = room.getJID().getNode();
 					return name;
 				}
