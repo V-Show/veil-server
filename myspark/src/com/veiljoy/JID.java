@@ -12,4 +12,24 @@ public class JID {
         
         return node;
 	}
+	
+	public static String getNickname(String roomJid) {
+		String nickname = roomJid;
+		int index = roomJid.indexOf("/");
+		
+		if (index > 0) {
+			nickname = roomJid.substring(index + 1);
+		}
+		return nickname;
+	}
+	
+	public static String getBaredID(String jid) {
+		String baredId = jid;
+		int index = jid.indexOf("/");
+		
+		if (index > 0) {
+			baredId = baredId.substring(0, index);
+		}
+		return baredId;
+	}
 }

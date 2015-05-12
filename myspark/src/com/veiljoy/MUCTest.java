@@ -3,12 +3,21 @@ package com.veiljoy;
 import java.util.Iterator;
 
 import org.jivesoftware.smack.AbstractXMPPConnection;
+import org.jivesoftware.smack.PresenceListener;
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.SmackException.NoResponseException;
+import org.jivesoftware.smack.SmackException.NotConnectedException;
 import org.jivesoftware.smack.XMPPException.XMPPErrorException;
+import org.jivesoftware.smack.packet.ExtensionElement;
+import org.jivesoftware.smack.packet.Presence;
+import org.jivesoftware.smackx.muc.MUCRole;
 import org.jivesoftware.smackx.muc.MultiUserChat;
 import org.jivesoftware.smackx.muc.MultiUserChatManager;
 import org.jivesoftware.smackx.muc.ParticipantStatusListener;
+import org.jivesoftware.smackx.muc.packet.MUCItem;
+import org.jivesoftware.smackx.muc.packet.MUCUser;
+import org.jivesoftware.smackx.vcardtemp.VCardManager;
+import org.jivesoftware.smackx.vcardtemp.packet.VCard;
 import org.jivesoftware.smackx.xdata.Form;
 import org.jivesoftware.smackx.xdata.FormField;
 
@@ -20,6 +29,7 @@ public class MUCTest {
 	MultiUserChat muc;
 	String roomName;
 	String userName;
+	UserInfo[] users = new UserInfo[4];
 
 	public MUCTest(AbstractXMPPConnection connection) {
 		this.connection = connection;
@@ -30,13 +40,14 @@ public class MUCTest {
 
 	public void init(RubInfo info) {
 		// debug
-		 info.setRoom("chatroom");
-		 info.setCreate(false);
-		
+		// info.setRoom("chatroom");
+		// info.setCreate(false);
+
 		roomName = info.getRoom();
 		muc = mucManager.getMultiUserChat(roomName + "@conference.veil");
 		muc.addParticipantStatusListener(new MyParticipantStatusListener());
-		
+		muc.addParticipantListener(new MyPresenceListener());
+
 		// create room if need
 		try {
 			if (info.isCreate()) {
@@ -44,7 +55,7 @@ public class MUCTest {
 			} else {
 				muc.join(userName);
 			}
-			
+
 			// 获取房间成员
 			Iterator<String> it = muc.getOccupants().iterator();
 			while (it.hasNext()) {
@@ -60,7 +71,7 @@ public class MUCTest {
 	void createRoom() throws NoResponseException, XMPPErrorException,
 			SmackException {
 		muc.create(userName);
-		
+
 		// 获得聊天室的配置表单
 		Form form = muc.getConfigurationForm();
 		// 根据原始表单创建一个要提交的新表单。
@@ -99,7 +110,7 @@ public class MUCTest {
 		// 发送已完成的表单（有默认值）到服务器来配置聊天室
 		muc.sendConfigurationForm(submitForm);
 	}
-	
+
 	class MyParticipantStatusListener implements ParticipantStatusListener {
 
 		@Override
@@ -115,79 +126,148 @@ public class MUCTest {
 		@Override
 		public void kicked(String participant, String actor, String reason) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void voiceGranted(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void voiceRevoked(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void banned(String participant, String actor, String reason) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void membershipGranted(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void membershipRevoked(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void moderatorGranted(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void moderatorRevoked(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void ownershipGranted(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void ownershipRevoked(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void adminGranted(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void adminRevoked(String participant) {
 			// TODO Auto-generated method stub
-			
+
 		}
 
 		@Override
 		public void nicknameChanged(String participant, String newNickname) {
 			// TODO Auto-generated method stub
-			
+
+		}
+	}
+
+	class MyPresenceListener implements PresenceListener {
+		@Override
+		public void processPresence(Presence presence) {
+			ExtensionElement pe = presence
+					.getExtension("http://jabber.org/protocol/muc#user");
+			if (pe != null) {
+				MUCUser user = (MUCUser) pe;
+				MUCItem item = user.getItem();
+				String userJid = item.getJid();
+				String username = JID.getNode(userJid);
+				String nickname = JID.getNickname(presence.getFrom());
+				MUCRole role = item.getRole();
+
+				VCard vCard = null;
+				try {
+					vCard = VCardManager.getInstanceFor(connection).loadVCard(
+							JID.getBaredID(userJid));
+				} catch (NoResponseException | XMPPErrorException
+						| NotConnectedException e) {
+					e.printStackTrace();
+				}
+
+				UserInfo userInfo = new UserInfo();
+				userInfo.setUsername(username);
+				userInfo.setNickname(nickname);
+				if (vCard != null) {
+					userInfo.setAvatar(vCard.getAvatar());
+				}
+
+				String event = null;
+				int index = -1;
+				if (presence.getType() == Presence.Type.available) {
+					event = "join";
+					if (role == MUCRole.moderator) {
+						users[0] = userInfo;
+						index = 0;
+					} else {
+						// find a empty seat
+						for (int i = 1; i < 4; i++) {
+							if (users[i] == null) {
+								users[i] = userInfo;
+								index = i;
+								break;
+							}
+						}
+					}
+				} else if (presence.getType() == Presence.Type.unavailable) {
+					event = "left";
+					// find the occupant
+					for (int i = 0; i < 4; i++) {
+						if (users[i] != null
+								&& users[i].getUsername().equals(username)) {
+							users[i] = null;
+							index = i;
+							break;
+						}
+					}
+				}
+
+				if (event != null && index != -1) {
+					System.out.println(event + " " + "username: " + username
+							+ ", nickname: " + nickname + ", seat on " + index);
+				}
+			}
+			// pe = presence.getExtension("vcard-temp:x:update");
+			// pe = presence.getExtension("jabber:x:avatar");
 		}
 	}
 }
