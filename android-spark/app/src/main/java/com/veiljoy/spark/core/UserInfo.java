@@ -1,4 +1,4 @@
-package com.veiljoy.spark.android;
+package com.veiljoy.spark.core;
 
 /**
  * Created by Administrator on 2015/5/8.

@@ -155,7 +155,7 @@ public class NetThread extends HandlerThread {
                 case Carriers.CARRIER_ENTER_ROOM: {
                     Carriers.EnterRoomCarrier carrier = (Carriers.EnterRoomCarrier) msg.obj;
                     try {
-                        MUC.getInstanceFor(carrier.room, carrier.create);
+                        MUC.getInstanceFor(carrier.room, carrier.create, carrier.handler);
                     } catch (Exception e) {
                         e.printStackTrace();
                         carrier.error = Carriers.convertError(e);
@@ -163,6 +163,39 @@ public class NetThread extends HandlerThread {
 
                     Message rsp = carrier.handler.obtainMessage();
                     rsp.what = Carriers.CARRIER_ENTER_ROOM;
+                    rsp.obj = carrier;
+                    carrier.handler.sendMessage(rsp);
+                }
+                break;
+                case Carriers.CARRIER_SEND_MESSAGE: {
+                    Carriers.SendMessageCarrier carrier = (Carriers.SendMessageCarrier) msg.obj;
+                    try {
+                        MUC muc = MUC.getInstance();
+                        muc.sendMessage(carrier.id, carrier.body);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        carrier.error = Carriers.convertError(e);
+
+                        // 直接发送失败
+                        Message rsp = carrier.handler.obtainMessage();
+                        rsp.what = Carriers.CARRIER_SEND_MESSAGE;
+                        rsp.obj = carrier;
+                        carrier.handler.sendMessage(rsp);
+                    }
+                }
+                break;
+                case Carriers.CARRIER_KICK: {
+                    Carriers.KickCarrier carrier = (Carriers.KickCarrier) msg.obj;
+                    try {
+                        MUC muc = MUC.getInstance();
+                        muc.kick(carrier.nickname, "no reason");
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        carrier.error = Carriers.convertError(e);
+                    }
+
+                    Message rsp = carrier.handler.obtainMessage();
+                    rsp.what = Carriers.CARRIER_KICK;
                     rsp.obj = carrier;
                     carrier.handler.sendMessage(rsp);
                 }

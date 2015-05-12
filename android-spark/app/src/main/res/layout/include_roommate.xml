@@ -6,19 +6,22 @@
     android:orientation="horizontal">
 
     <TextView
-        android:layout_width="wrap_content"
+        android:id="@+id/nickname"
+        android:layout_width="120dp"
         android:layout_height="wrap_content"
         android:text="roommate" />
 
     <Button
+        android:id="@+id/lock"
+        style="?android:textAppearanceSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="lock" />
+
+    <Button
+        android:id="@+id/kick"
         style="?android:textAppearanceSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="kick" />
-
-    <Button
-        style="?android:textAppearanceSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="refresh" />
 </LinearLayout>

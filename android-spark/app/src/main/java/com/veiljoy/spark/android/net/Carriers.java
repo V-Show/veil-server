@@ -3,6 +3,8 @@ package com.veiljoy.spark.android.net;
 import android.os.Handler;
 import android.os.Message;
 
+import com.veiljoy.spark.core.UserInfo;
+
 import org.jivesoftware.smack.SmackException;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
@@ -19,22 +21,30 @@ public class Carriers {
     public static final int CARRIER_UPLOAD_VCARD = 3;
     public static final int CARRIER_RUB = 4;
     public static final int CARRIER_ENTER_ROOM = 5;
+    public static final int CARRIER_RECEIVE_MESSAGE = 7;
+    public static final int CARRIER_SEND_MESSAGE = 8;
+    public static final int CARRIER_UPDATE_OCCUPANTS = 9;
+    public static final int CARRIER_KICK = 10;
 
     public enum Error {
         no_error,
         // xmpp error exception
         conflict,
+        forbidden,
+        not_allowed,
+        item_not_found,
+        not_authorized,
         // smack exception
         already_connected,
         already_logged_in,
         unknown,
-    };
+    }
 
     public static class Constants {
         public static final String GenderField = "GENDER";
         public static final String GenderMale = "male";
         public static final String GenderFemale = "female";
-    };
+    }
 
     public static class ConnectCarrier {
         public Handler handler;
@@ -166,6 +176,106 @@ public class Carriers {
         }
     }
 
+    public static class ReceiveMessageCarrier {
+        public String from;
+        public String body;
+        public String subject;
+        public Handler handler;
+        public Error error;
+
+        public ReceiveMessageCarrier(String from, String body, String subject, Handler handler) {
+            this.from = from;
+            this.body = body;
+            this.subject = subject;
+            this.handler = handler;
+            this.error = Error.no_error;
+        }
+
+        @Override
+        public String toString() {
+            return "EnterRoomCarrier "
+                    + "from=" + from
+                    + ", body=" + body
+                    + ", subject=" + subject
+                    + ", handler=" + handler
+                    + ", error=" + error;
+        }
+    }
+
+    public static class SendMessageCarrier {
+        public int id;
+        public String body;
+        public Handler handler;
+        public Error error;
+
+        public SendMessageCarrier(int id, String body, Handler handler) {
+            this.id = id;
+            this.body = body;
+            this.handler = handler;
+            this.error = Error.no_error;
+        }
+
+        @Override
+        public String toString() {
+            return "SendMessageCarrier "
+                    + "id=" + id
+                    + ", body=" + body
+                    + ", handler=" + handler
+                    + ", error=" + error;
+        }
+    }
+
+    public static class UpdateOccupantsCarrier {
+        public enum Event {
+            join,
+            left
+        }
+
+        public Event event;
+        public int index;
+        public UserInfo[] users;
+        public Handler handler;
+        public Error error;
+
+        public UpdateOccupantsCarrier(Event event, int index, UserInfo[] users, Handler handler) {
+            this.event = event;
+            this.index = index;
+            this.users = users;
+            this.handler = handler;
+            this.error = Error.no_error;
+        }
+
+        @Override
+        public String toString() {
+            return "UpdateOccupantsCarrier "
+                    + "event=" + event
+                    + ", index=" + index
+                    + ", users=" + users
+                    + ", handler=" + handler
+                    + ", error=" + error;
+        }
+    }
+
+    public static class KickCarrier {
+        public String nickname;
+        public Handler handler;
+        public Error error;
+
+        public KickCarrier(String nickname, Handler handler) {
+            this.nickname = nickname;
+            this.handler = handler;
+            this.error = Error.no_error;
+        }
+
+        @Override
+        public String toString() {
+            return "KickCarrier "
+                    + "nickname=" + nickname
+                    + ", handler=" + handler
+                    + ", error=" + error;
+        }
+    }
+
     public static void connect(Message msg, ConnectCarrier carrier) {
         msg.what = CARRIER_CONNECT;
         msg.obj = carrier;
@@ -196,25 +306,47 @@ public class Carriers {
         msg.obj = carrier;
     }
 
+    public static void receiveMessage(Message msg, ReceiveMessageCarrier carrier) {
+        msg.what = CARRIER_RECEIVE_MESSAGE;
+        msg.obj = carrier;
+    }
+
+    public static void sendMessage(Message msg, SendMessageCarrier carrier) {
+        msg.what = CARRIER_SEND_MESSAGE;
+        msg.obj = carrier;
+    }
+
+    public static void updateOccupants(Message msg, UpdateOccupantsCarrier carrier) {
+        msg.what = CARRIER_UPDATE_OCCUPANTS;
+        msg.obj = carrier;
+    }
+
+    public static void kick(Message msg, KickCarrier carrier) {
+        msg.what = CARRIER_KICK;
+        msg.obj = carrier;
+    }
+
     public static Error convertError(Exception e) {
         Error error = Error.unknown;
         if (e == null) {
             error = Error.no_error;
-        }
-
-        else if (e instanceof SmackException) {
-            if (e instanceof  SmackException.AlreadyConnectedException) {
+        } else if (e instanceof SmackException) {
+            if (e instanceof SmackException.AlreadyConnectedException) {
                 error = Error.already_connected;
             } else if (e instanceof SmackException.AlreadyLoggedInException) {
                 error = Error.already_logged_in;
             }
-        }
-
-        else if (e instanceof XMPPException.XMPPErrorException) {
-            XMPPException.XMPPErrorException XMPPException = (XMPPException.XMPPErrorException)e;
+        } else if (e instanceof XMPPException.XMPPErrorException) {
+            XMPPException.XMPPErrorException XMPPException = (XMPPException.XMPPErrorException) e;
             org.jivesoftware.smack.packet.XMPPError.Condition condition = XMPPException.getXMPPError().getCondition();
             if (condition == org.jivesoftware.smack.packet.XMPPError.Condition.conflict) {
                 error = Error.conflict;
+            } else if (condition == org.jivesoftware.smack.packet.XMPPError.Condition.item_not_found) {
+                error = Error.item_not_found;
+            } else if (condition == org.jivesoftware.smack.packet.XMPPError.Condition.forbidden) {
+                error = Error.forbidden;
+            } else if (condition == org.jivesoftware.smack.packet.XMPPError.Condition.not_allowed) {
+                error = Error.not_allowed;
             }
         }
         return error;
