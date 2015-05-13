@@ -1,11 +1,13 @@
 package com.veiljoy.spark.android.ui;
 
 import android.app.Activity;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.veiljoy.spark.android.R;
@@ -31,6 +33,7 @@ public class ChatActivity extends Activity {
 
     TextView[] nicknames = new TextView[4];
     Button[] kickButtons = new Button[3];
+    ImageView[] avatars = new ImageView[4];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +64,11 @@ public class ChatActivity extends Activity {
         kickButtons[1] = (Button) (findViewById(R.id.roommate_2).findViewById(R.id.kick));
         kickButtons[2] = (Button) (findViewById(R.id.roommate_3).findViewById(R.id.kick));
 
+        avatars[0] = (ImageView) (findViewById(R.id.room_owner).findViewById(R.id.avatar));
+        avatars[1] = (ImageView) (findViewById(R.id.roommate_1).findViewById(R.id.avatar));
+        avatars[2] = (ImageView) (findViewById(R.id.roommate_2).findViewById(R.id.avatar));
+        avatars[3] = (ImageView) (findViewById(R.id.roommate_3).findViewById(R.id.avatar));
+
         for (int i = 0; i < 3; i++) {
             kickButtons[i].setTag(i);
             kickButtons[i].setOnClickListener(new View.OnClickListener() {
@@ -74,6 +82,7 @@ public class ChatActivity extends Activity {
 
         for (int i = 0; i < 4; i++) {
             nicknames[i].setText("");
+            avatars[i].setVisibility(View.INVISIBLE);
         }
     }
 
@@ -116,11 +125,17 @@ public class ChatActivity extends Activity {
         @Override
         public void onJoin(int index, UserInfo[] users) {
             nicknames[index].setText(users[index].getNickname());
+            byte[] b = users[index].getAvatar();
+            if (b != null) {
+                avatars[index].setVisibility(View.VISIBLE);
+                avatars[index].setImageBitmap(BitmapFactory.decodeByteArray(b, 0, b.length));
+            }
         }
 
         @Override
         public void onLeft(int index, UserInfo[] users) {
             nicknames[index].setText("");
+            avatars[index].setVisibility(View.INVISIBLE);
         }
     }
 }

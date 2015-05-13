@@ -5,6 +5,8 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -13,10 +15,14 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.RadioButton;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,12 +32,15 @@ import com.veiljoy.spark.android.net.Carriers;
 import com.veiljoy.spark.android.net.Configs;
 import com.veiljoy.spark.android.net.NetThread;
 import com.veiljoy.spark.android.utils.DeviceUtil;
+import com.veiljoy.spark.android.utils.FormatTools;
 import com.veiljoy.spark.android.utils.SharePreferenceUtil;
 import com.veiljoy.spark.core.SimpleSparkListener;
 import com.veiljoy.spark.core.SparkAction;
 import com.veiljoy.spark.core.SparkError;
 
 import org.jivesoftware.smackx.vcardtemp.packet.VCard;
+
+import java.io.ByteArrayOutputStream;
 
 
 /**
@@ -43,12 +52,14 @@ public class RegisterActivity extends Activity {
     private AutoCompleteTextView mNicknameView;
     private EditText mPasswordView;
     private RadioButton maleRadio;
+    private ImageView mAvatarImageView;
 
     private String username;
     private String nickname;
     private String password;
+    private byte[] avatar;
     // flag
-    private boolean mWaitLogin;
+    private boolean mWaiting;
 
     SparkApplication mApp;
     RegisterSparkListener mListener;
@@ -58,7 +69,7 @@ public class RegisterActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        mApp = (SparkApplication)getApplication();
+        mApp = (SparkApplication) getApplication();
         mListener = new RegisterSparkListener();
 
         // Set up the register form.
@@ -78,11 +89,51 @@ public class RegisterActivity extends Activity {
 
         maleRadio = (RadioButton) findViewById(R.id.radioMale);
 
+        mAvatarImageView = (ImageView) findViewById(R.id.avatar);
+        Drawable defaultAvatar = getResources().getDrawable(R.mipmap.ic_chat_avatar_6);
+        avatar = FormatTools.Drawable2Bytes(defaultAvatar);
+
         Button signInButton = (Button) findViewById(R.id.sign_in_button);
         signInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
+            }
+        });
+
+        Spinner spinner = (Spinner) findViewById(R.id.spinner);
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinner_avatars, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // set avatar
+                int avatars[] = {
+                        R.mipmap.ic_chat_avatar_0,
+                        R.mipmap.ic_chat_avatar_1,
+                        R.mipmap.ic_chat_avatar_2,
+                        R.mipmap.ic_chat_avatar_3,
+                        R.mipmap.ic_chat_avatar_4,
+                        R.mipmap.ic_chat_avatar_5,
+                        R.mipmap.ic_chat_avatar_6,
+                        R.mipmap.ic_chat_avatar_7,
+                        R.mipmap.ic_chat_avatar_8,
+                        R.mipmap.ic_chat_avatar_9,
+                        R.mipmap.ic_chat_avatar_10,
+                        R.mipmap.ic_chat_avatar_11
+                };
+                Drawable d = getResources().getDrawable(avatars[position]);
+                mAvatarImageView.setImageDrawable(d);
+                avatar = FormatTools.Drawable2Bytes(d);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
     }
@@ -136,7 +187,7 @@ public class RegisterActivity extends Activity {
             cancel = true;
         }
 
-        if (cancel) {
+        if (cancel || mWaiting) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
             focusView.requestFocus();
@@ -145,6 +196,7 @@ public class RegisterActivity extends Activity {
             if (TextUtils.isEmpty(password)) {
                 password = Configs.defaultPassword;
             }
+            mWaiting = true;
             mApp.register(username, nickname, password);
         }
     }
@@ -163,6 +215,8 @@ public class RegisterActivity extends Activity {
 
     private void startChatActivity() {
         Intent intent = new Intent(this, ChatActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
+                | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finish();
     }
@@ -186,7 +240,8 @@ public class RegisterActivity extends Activity {
             VCard vCard = new VCard();
             vCard.setField(Carriers.Constants.GenderField, gender);
             // FIXME use nickname field to save the real name of user
-            vCard.setNickName(mNicknameView.getText().toString());
+            vCard.setNickName(nickname);
+            vCard.setAvatar(avatar);
 
             mApp.uploadVCard(vCard);
         }
@@ -203,6 +258,7 @@ public class RegisterActivity extends Activity {
 
         @Override
         public void onEnterRoom() {
+            mWaiting = false;
             startChatActivity();
         }
 

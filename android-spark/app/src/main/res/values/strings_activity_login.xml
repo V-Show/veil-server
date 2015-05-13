@@ -20,4 +20,19 @@
     <string name="dialog_retry">Retry</string>
     <string name="dialog_exit">Exit</string>
 
+    <string-array name="spinner_avatars">
+        <item>Avatar: 0</item>
+        <item>Avatar: 1</item>
+        <item>Avatar: 2</item>
+        <item>Avatar: 3</item>
+        <item>Avatar: 4</item>
+        <item>Avatar: 5</item>
+        <item>Avatar: 6</item>
+        <item>Avatar: 7</item>
+        <item>Avatar: 8</item>
+        <item>Avatar: 9</item>
+        <item>Avatar: 10</item>
+        <item>Avatar: 11</item>
+    </string-array>
+
 </resources>
